@@ -1,0 +1,97 @@
+﻿@inject IJSRuntime JS
+@inject NavigationManager Navigation
+@using EncuestaDisenio.DATA
+@using Microsoft.AspNetCore.Authorization
+@inject HttpClient Http
+@attribute [Authorize]
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">EncuestaDisenio</a>
+    </div>
+</div>
+
+@if (isLoggedIn)
+{
+    <button class="btn btn-danger btn-sm" style="width:auto; height:auto; padding:5px 10px;" @onclick="Logout">
+        Cerrar sesión
+    </button>
+
+
+}
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="flex-column">
+        @if (!isLoggedIn)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Inicio
+                </NavLink>
+            </div>
+        }
+        else
+        {
+            <div class="nav-item px-3">
+
+                <NavLink class="nav-link" href="@GetHomePage(idrol)">@nombreUsuario</NavLink>
+
+            </div>
+        }
+    </nav>
+</div>
+
+@code {
+
+
+    private string GetHomePage(int rol)
+    {
+        return rol switch
+        {
+            1 => "/admin",
+            2 => "/estudiante",
+            3 => "/profesor",
+            _ => "/login"
+        };
+    }
+
+    private bool isLoggedIn = false;
+    private string nombreUsuario;
+    private int idrol;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                var idUsuario = await JS.InvokeAsync<string>("sessionStorage.getItem", "idusuario");
+                isLoggedIn = !string.IsNullOrEmpty(idUsuario);
+
+                nombreUsuario = await JS.InvokeAsync<string>("sessionStorage.getItem", "nombre");
+
+                var rolString = await JS.InvokeAsync<string>("sessionStorage.getItem", "idrol");
+                idrol = string.IsNullOrEmpty(rolString) ? 0 : int.Parse(rolString);
+
+                StateHasChanged();
+            }
+            catch
+            {
+                isLoggedIn = false;
+                nombreUsuario = "Usuario";
+                idrol = 0;
+            }
+        }
+    }
+
+
+    private async Task Logout()
+    {
+        await JS.InvokeVoidAsync("sessionStorage.clear");
+        isLoggedIn = false;
+        Navigation.NavigateTo("/login", true);
+    }
+
+
+}

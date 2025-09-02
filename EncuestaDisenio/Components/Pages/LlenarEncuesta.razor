@@ -1,0 +1,265 @@
+﻿@page "/llenarencuesta"
+@using EncuestaDisenio.DATA
+@inject ApplicationDbContextEncuesta _context
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+
+<h3>Llenar Encuesta</h3>
+
+<EditForm Model="@respuesta" OnValidSubmit="GuardarEncuesta">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <!-- Nombre -->
+    <div>
+        <label>Nombre:</label>
+        <InputText @bind-Value="respuesta.Nombre" class="form-control" />
+    </div>
+
+    <!-- Apellido -->
+    <div>
+        <label>Apellido:</label>
+        <InputText @bind-Value="respuesta.Apellido" class="form-control" />
+    </div>
+
+    <!-- Sexo -->
+    <div>
+        <label>Sexo:</label>
+        <InputSelect @bind-Value="respuesta.SexoClave" class="form-control">
+            <option value="0">Seleccione...</option>
+            @foreach (var item in sexos)
+            {
+                <option value="@item.Clave">@item.Valor</option>
+            }
+        </InputSelect>
+    </div>
+
+    <!-- Identidad -->
+    <div>
+        <label>Identidad:</label>
+        <InputText @bind-Value="respuesta.Identidad" class="form-control" />
+    </div>
+
+
+    <!-- Departamento -->
+    <div>
+        <label>Departamento:</label>
+        <InputSelect @bind-Value="respuesta.DepartamentoClave" class="form-control">
+            <option value="0">Seleccione...</option>
+            @foreach (var item in departamentos)
+            {
+                <option value="@item.Clave">@item.Valor</option>
+            }
+        </InputSelect>
+    </div>
+
+    <!-- Ciudad -->
+    <div>
+        <label>Ciudad:</label>
+        <InputSelect @bind-Value="respuesta.CiudadClave" class="form-control">
+            <option value="0">Seleccione...</option>
+            @foreach (var item in ciudades)
+            {
+                <option value="@item.Clave">@item.Valor</option>
+            }
+        </InputSelect>
+    </div>
+
+    <!-- Facultad -->
+    <div>
+        <label>Facultad:</label>
+        <InputSelect @bind-Value="respuesta.FacultadClave" class="form-control">
+            <option value="0">Seleccione...</option>
+            @foreach (var item in facultades)
+            {
+                <option value="@item.Clave">@item.Valor</option>
+            }
+        </InputSelect>
+    </div>
+
+    <!-- Carrera -->
+    <div>
+        <label>Carrera:</label>
+        <InputSelect @bind-Value="respuesta.CarreraClave" class="form-control">
+            <option value="0">Seleccione...</option>
+            @foreach (var item in carreras)
+            {
+                <option value="@item.Clave">@item.Valor</option>
+            }
+        </InputSelect>
+    </div>
+
+    <!-- Año de estudios -->
+    <div>
+        <label>Año de estudios:</label>
+        <InputNumber @bind-Value="respuesta.PreguntaIX" class="form-control" />
+    </div>
+
+    <!-- Matrícula -->
+    <div>
+        <label>Matrícula:</label>
+        <InputSelect @bind-Value="respuesta.MatriculaClave" class="form-control">
+            <option value="0">Seleccione...</option>
+            @foreach (var item in matriculas)
+            {
+                <option value="@item.Clave">@item.Valor</option>
+            }
+        </InputSelect>
+    </div>
+
+    <!-- Becado -->
+    <div>
+        <label>Becado:</label>
+        <InputSelect @bind-Value="respuesta.BecadoClave" class="form-control">
+            <option value="0">Seleccione...</option>
+            @foreach (var item in becados)
+            {
+                <option value="@item.Clave">@item.Valor</option>
+            }
+        </InputSelect>
+    </div>
+
+    <!-- XII -->
+    <div>
+        <label>I. Usted ha usado el Sistema de Matrícula en línea?</label>
+        <InputSelect @bind-Value="respuesta.XiiClave" class="form-control">
+            <option value="0">Seleccione...</option>
+            @foreach (var item in xii)
+            {
+                <option value="@item.Clave">@item.Valor</option>
+            }
+        </InputSelect>
+    </div>
+
+    <!-- XIII -->
+    <div>
+        <label>II. Qué le parece el nuevo sistema de matrícula en línea?</label>
+        <InputSelect @bind-Value="respuesta.XiiiClave" class="form-control">
+            <option value="0">Seleccione...</option>
+            @foreach (var item in xiii)
+            {
+                <option value="@item.Clave">@item.Valor</option>
+            }
+        </InputSelect>
+    </div>
+
+    <!-- XIV -->
+    <div>
+        <label>III. Qué tan accesible está el nuevo sistema?</label>
+        <InputSelect @bind-Value="respuesta.XivClave" class="form-control">
+            <option value="0">Seleccione...</option>
+            @foreach (var item in xiv)
+            {
+                <option value="@item.Clave">@item.Valor</option>
+            }
+        </InputSelect>
+    </div>
+
+    <!-- XV -->
+    <div>
+        <label>IV. De qué manera le ha ayudado el nuevo sistema?</label>
+        <InputSelect @bind-Value="respuesta.XvClave" class="form-control">
+            <option value="0">Seleccione...</option>
+            @foreach (var item in xv)
+            {
+                <option value="@item.Clave">@item.Valor</option>
+            }
+        </InputSelect>
+    </div>
+
+    <!-- XVI -->
+    <div>
+        <label>V. Cuánto dinero ha ahorrado usar el nuevo sistema?</label>
+        <InputSelect @bind-Value="respuesta.XviClave" class="form-control">
+            <option value="0">Seleccione...</option>
+            @foreach (var item in xvi)
+            {
+                <option value="@item.Clave">@item.Valor</option>
+            }
+        </InputSelect>
+    </div>
+
+    <!-- XVII -->
+    <div>
+        <label>VI. Qué recomienda para mejorar el sistema?</label>
+        <InputSelect @bind-Value="respuesta.XviiClave" class="form-control">
+            <option value="0">Seleccione...</option>
+            @foreach (var item in xvii)
+            {
+                <option value="@item.Clave">@item.Valor</option>
+            }
+        </InputSelect>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+</EditForm>
+
+@code {
+    private Respuesta respuesta = new Respuesta
+    {
+        SexoClave = 0,
+        DepartamentoClave = 0,
+        CiudadClave = 0,
+        FacultadClave = 0,
+        CarreraClave = 0,
+        MatriculaClave = 0,
+        BecadoClave = 0,
+        XiiClave = 0,
+        XiiiClave = 0,
+        XivClave = 0,
+        XvClave = 0,
+        XviClave = 0,
+        XviiClave = 0
+    };
+
+    private List<iii_sexo> sexos = new();
+    private List<v_departamento> departamentos = new();
+    private List<vi_ciudad> ciudades = new();
+    private List<vii_facultad> facultades = new();
+    private List<viii_carrera> carreras = new();
+    private List<x_matricula> matriculas = new();
+    private List<xi_becado> becados = new();
+    private List<xii> xii = new();
+    private List<xiii> xiii = new();
+    private List<xiv> xiv = new();
+    private List<xv> xv = new();
+    private List<xvi> xvi = new();
+    private List<xvii> xvii = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        sexos = await _context.sexos.ToListAsync();
+        departamentos = await _context.departamentos.ToListAsync();
+        ciudades = await _context.ciudades.ToListAsync();
+        facultades = await _context.facultades.ToListAsync();
+        carreras = await _context.carreras.ToListAsync();
+        matriculas = await _context.matriculas.ToListAsync();
+        becados = await _context.becados.ToListAsync();
+        xii = await _context.xiis.ToListAsync();
+        xiii = await _context.xiiis.ToListAsync();
+        xiv = await _context.xivs.ToListAsync();
+        xv = await _context.xvs.ToListAsync();
+        xvi = await _context.xvis.ToListAsync();
+        xvii = await _context.xviis.ToListAsync();
+    }
+
+    private async Task GuardarEncuesta()
+    {
+        try
+        {
+            _context.respuestas.Add(respuesta);
+            await _context.SaveChangesAsync();
+            await JS.InvokeVoidAsync("alert", "Encuesta guardada correctamente!");
+            Navigation.NavigateTo("/llenarencuesta");
+        }
+        catch (DbUpdateException dbEx)
+        {
+            var innerMessage = dbEx.InnerException?.Message ?? dbEx.Message;
+            await JS.InvokeVoidAsync("alert", "Error guardando la encuesta: " + innerMessage);
+        }
+    }
+
+}

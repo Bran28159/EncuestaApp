@@ -1,0 +1,113 @@
+﻿@page "/respuestaseditar"
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+
+<h3>Respuestas</h3>
+
+@if (encuestas is null)
+{
+    <p>Cargando...</p>
+}
+else if (encuestas.Count == 0)
+{
+    <p>No hay respuestas.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Sexo</th>
+                <th>Departamento</th>
+                <th>Ciudad</th>
+                <th>Facultad</th>
+                <th>Carrera</th>
+                <th>Matricula</th>
+                <th>Becado</th>
+                <th>XII</th>
+                <th>XIII</th>
+                <th>XIV</th>
+                <th>XV</th>
+                <th>XVI</th>
+                <th>XVII</th>
+                <th>Acciones</th> @* 👈 Nueva columna *@
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in encuestas)
+            {
+                <tr>
+                    <td>@r.Numero</td>
+                    <td>@r.Nombre</td>
+                    <td>@r.Apellido</td>
+                    <td>@r.Sexo</td>
+                    <td>@r.Departamento</td>
+                    <td>@r.Ciudad</td>
+                    <td>@r.Facultad</td>
+                    <td>@r.Carrera</td>
+                    <td>@r.Matricula</td>
+                    <td>@r.Becado</td>
+                    <td>@r.Xii</td>
+                    <td>@r.Xiii</td>
+                    <td>@r.Xiv</td>
+                    <td>@r.Xv</td>
+                    <td>@r.Xvi</td>
+                    <td>@r.Xvii</td>
+                    <td>
+              
+                        <button class="btn btn-primary btn-sm" @onclick="() => EditRespuesta(r.Numero)">
+                            Editar
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+}
+
+@code {
+
+   
+
+
+
+    private List<Respuesta>? encuestas;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Llamando al controller correcto
+        encuestas = await Http.GetFromJsonAsync<List<Respuesta>>("api/Respuestas");
+    }
+
+    // DTO para mostrar solo los valores string de las relaciones
+    public class Respuesta
+    {
+        public int Numero { get; set; }
+        public string Nombre { get; set; }
+        public string Apellido { get; set; }
+        public string Sexo { get; set; }
+        public string Departamento { get; set; }
+        public string Ciudad { get; set; }
+        public string Facultad { get; set; }
+        public string Carrera { get; set; }
+        public string Matricula { get; set; }
+        public string Becado { get; set; }
+        public string Xii { get; set; }
+        public string Xiii { get; set; }
+        public string Xiv { get; set; }
+        public string Xv { get; set; }
+        public string Xvi { get; set; }
+        public string Xvii { get; set; }
+    }
+    private void EditRespuesta(int id)
+    {
+        Navigation.NavigateTo($"/editarencuesta/{id}");
+    }
+
+}

@@ -1,0 +1,68 @@
+﻿@page "/registrar"
+@using EncuestaDisenio.DATA
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<EditForm Model="@nuevoUsuario" OnValidSubmit="RegistrarUsuario">
+    <div class="input-box">
+        <InputText @bind-Value="nuevoUsuario.nombre" placeholder="Nombre" />
+    </div>
+    <div class="input-box">
+        <InputText @bind-Value="nuevoUsuario.login" placeholder="Usuario" />
+    </div>
+    <div class="input-box">
+        <InputText @bind-Value="nuevoUsuario.clave" type="password" placeholder="Clave" />
+    </div>
+
+    <!-- Radios para seleccionar el rol visible, idrol se asigna automáticamente -->
+    <div class="input-box">
+        <label>
+            <input type="radio" name="rol" @onclick="@(() => nuevoUsuario.idrol = 2)" /> Estudiante
+        </label>
+        <label style="margin-left:15px;">
+            <input type="radio" name="rol" @onclick="@(() => nuevoUsuario.idrol = 3)" /> Profesor
+        </label>
+    </div>
+
+    <div class="input-box button">
+        <button type="submit" class="btn btn-primary">Registrar</button>
+    </div>
+</EditForm>
+
+<p>@mensaje</p>
+
+@code {
+    private UsuarioRegistroDto nuevoUsuario = new UsuarioRegistroDto();
+    private string mensaje = string.Empty;
+
+    private async Task RegistrarUsuario()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/Usuario/registrar", nuevoUsuario);
+
+            if (response.IsSuccessStatusCode)
+            {
+                mensaje = "Usuario registrado correctamente ✅";
+                Navigation.NavigateTo("/login");
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                mensaje = $"Error al registrar usuario ❌: {error}";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error inesperado: {ex.Message}";
+        }
+    }
+
+    public class UsuarioRegistroDto
+    {
+        public string nombre { get; set; } = string.Empty;
+        public string login { get; set; } = string.Empty;
+        public string clave { get; set; } = string.Empty;
+        public int idrol { get; set; } // se rellena automáticamente al seleccionar radio
+    }
+}

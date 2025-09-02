@@ -1,0 +1,115 @@
+﻿@page "/login"
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+
+<EditForm Model="@login" OnValidSubmit="HandleLogin" class="form">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="con">
+        <header class="head-form">
+            <h2>Log In</h2>
+            <p>login here using your login and password</p>
+        </header>
+
+        <div class="field-set">
+            <!-- Usuario -->
+            <div class="field-set">
+                <span class="input-item"><i class="fa fa-user-circle"></i></span>
+                <input id="txt-input" class="form-input" placeholder="Usuario" @bind="login.Usuario" />
+            </div>
+
+            <br />
+
+            <!-- Clave -->
+            <div class="field-set" style="position:relative;">
+                <span class="input-item"><i class="fa fa-key"></i></span>
+                <input id="pwd" class="form-input" type="@passwordFieldType" placeholder="Contraseña" @bind="login.Clave" />
+                <i id="eye" class="fa @(showPassword ? "fa-eye-slash" : "fa-eye") fa-2x eye-icon" @onclick="TogglePassword"></i>
+            </div>
+
+            <br />
+            <button type="submit" class="log-in">Log In</button>
+        </div>
+
+        <div class="other">
+            <button type="button" class="btn submits frgt-pass">Forgot Password</button>
+            <button type="button" class="btn submits sign-up" @onclick="IrARegistrar">
+                Registrar
+            </button>
+        </div>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <p style="color:red">@errorMessage</p>
+        }
+    </div>
+</EditForm>
+
+@code {
+    private LoginModel login = new();
+    private string errorMessage;
+    private bool showPassword = false;
+    private string passwordFieldType => showPassword ? "text" : "password";
+
+    private async Task HandleLogin()
+    {
+        errorMessage = null;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("/api/Usuario/login", login);
+            if (!response.IsSuccessStatusCode)
+            {
+                errorMessage = "Usuario o contraseña incorrectos.";
+                return;
+            }
+
+            var usuarioSesion = await response.Content.ReadFromJsonAsync<UsuarioSesion>();
+
+            // Guardar en localStorage
+            await JS.InvokeVoidAsync("sessionStorage.setItem", "idusuario", usuarioSesion.idusuario.ToString());
+            await JS.InvokeVoidAsync("sessionStorage.setItem", "idrol", usuarioSesion.idrol.ToString());
+            await JS.InvokeVoidAsync("sessionStorage.setItem", "nombre", usuarioSesion.nombre);
+            await JS.InvokeVoidAsync("sessionStorage.setItem", "login", usuarioSesion.login);
+
+            // Redirigir según rol
+            if (usuarioSesion.idrol == 1)
+                Navigation.NavigateTo("/admin", true);
+            else if (usuarioSesion.idrol == 2)
+                Navigation.NavigateTo("/estudiante", true);
+            else if (usuarioSesion.idrol == 3)
+                Navigation.NavigateTo("/profesor", true);
+            else
+                Navigation.NavigateTo("/usuario", true);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error al conectar con el servidor: " + ex.Message;
+        }
+    }
+
+    private void TogglePassword() => showPassword = !showPassword;
+
+    private void IrARegistrar()
+    {
+        Navigation.NavigateTo("/registrar");
+    }
+
+    public class LoginModel
+    {
+        public string Usuario { get; set; }
+        public string Clave { get; set; }
+    }
+
+    public class UsuarioSesion
+    {
+        public int idusuario { get; set; }
+        public string nombre { get; set; }
+        public string login { get; set; }
+        public int idrol { get; set; }
+    }
+}

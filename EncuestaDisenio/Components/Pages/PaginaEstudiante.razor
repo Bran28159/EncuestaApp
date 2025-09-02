@@ -1,0 +1,37 @@
+﻿@page "/estudiante"
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+
+<h3>Bienvenido @nombreUsuario 👋</h3>
+
+<button type="button" class="btn btn-secondary" @onclick="IrALLenarEncuesta">Llenar encuesta</button>
+
+
+
+@code {
+    private string nombreUsuario = "Usuario"; // valor por defecto
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                var nombre = await JS.InvokeAsync<string>("localStorage.getItem", "nombre");
+                if (!string.IsNullOrEmpty(nombre))
+                {
+                    nombreUsuario = nombre;
+                    StateHasChanged(); // actualiza la UI
+                }
+            }
+            catch
+            {
+                nombreUsuario = "Usuario";
+            }
+        }
+    }
+
+    private void IrALLenarEncuesta() => Navigation.NavigateTo("/llenarencuesta");
+
+
+}
